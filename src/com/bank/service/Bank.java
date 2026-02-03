@@ -1,99 +1,100 @@
 package com.bank.service;
+
 import com.bank.data.BankAccount;
+import java.util.ArrayList; // Import the List tool!
 
-public class Bank
-{
-    public  BankAccount createAccount(String holdername, double balance, boolean isAccountActive)
-    {
+public class Bank {
 
-        return new BankAccount(holdername, balance,isAccountActive);
+    // 1. THE DATABASE: Holds all accounts safely
+    private ArrayList<BankAccount> accounts = new ArrayList<>();
+
+    // 2. CREATE: Auto-generates ID and saves to list
+    public void createAccount(String holderName, double balance, String pin) {
+        // Auto-ID: 1000, 1001, 1002...
+        String newId = String.valueOf(1000 + accounts.size());
+
+        BankAccount newAccount = new BankAccount(newId, holderName, balance, true, pin);
+
+        // SAVE IT
+        accounts.add(newAccount);
+
+        System.out.println(" Account Created! ID: " + newId + " (Don't forget this!)");
     }
 
-//    public void deposit(BankAccount account,double amount)
-//    {
-//        if(account.isAccountActive() ==true && amount>0)
-//        {
-//            InputUtils.readDouble("Please enter amount");
-//            System.out.println("Amount"+amount+" successfully deposited...");
-//        }
-//        else if(!account.isAccountActive())
-//        {
-//            System.out.println("Your account Account NO:-"+account.getAccountNumber()+" is no longer active!");
-//        }
-//        else
-//        {
-//            System.out.println("please enter positive amount...");
-//        }
-//    }
-
-    public void deposit(BankAccount account, double amount) {
-        // 1. Check if active AND if amount is positive
-        if (account.isAccountActive() && amount > 0) {
-
-            // 2. MATH: Calculate new balance
-            double currentBalance = account.getBalance();
-            double updatedBalance = currentBalance + amount;
-
-            // 3. UPDATE: Save the new balance back into the account object
-            account.setBalance(updatedBalance);
-
-            System.out.println("Successfully deposited: $" + amount);
-            System.out.println("New Balance: $" + account.getBalance());
-
-        } else if (!account.isAccountActive()) {
-            System.out.println("Error: Account is inactive.");
-        } else {
-            System.out.println("Error: Please enter a positive amount.");
+    // 3. SEARCH: Finds the account object using the ID string
+    public BankAccount findAccount(String accountId) {
+        for (BankAccount acc : accounts) {
+            if (acc.getAccountNumber().equals(accountId)) {
+                return acc;
+            }
         }
+        return null; // Not found
     }
 
-
-    public void displayAccountDetails(BankAccount account) {
+    // 4. DEPOSIT: Finds user -> Checks PIN -> Adds Money
+    public void deposit(String accountId, double amount, String pin) {
+        BankAccount account = findAccount(accountId); // Find them first
 
         if (account == null) {
-            System.out.println("Error: No account found to display.");
+            System.out.println(" Error: Account ID not found.");
             return;
         }
 
-        System.out.println("--- ACCOUNT DETAILS ---");
+        if (!account.checkPin(pin)) {
+            System.out.println(" ACCESS DENIED: Incorrect PIN.");
+            return;
+        }
+
+        if (amount > 0) {
+            double newBal = account.getBalance() + amount;
+            account.setBalance(newBal);
+            System.out.println("Deposited: $" + amount + " | New Balance: $" + newBal);
+        } else {
+            System.out.println("Error: Positive amount required.");
+        }
+    }
+
+    // 5. WITHDRAW
+    public void withdraw(String accountId, double amount, String pin) {
+        BankAccount account = findAccount(accountId);
+
+        if (account == null) {
+            System.out.println("Error: Account ID not found.");
+            return;
+        }
+
+        if (!account.checkPin(pin)) {
+            System.out.println(" ACCESS DENIED: Incorrect PIN.");
+            return;
+        }
+
+        if (amount > 0 && amount <= account.getBalance()) {
+            double newBal = account.getBalance() - amount;
+            account.setBalance(newBal);
+            System.out.println("Withdrawn: $" + amount + " | New Balance: $" + newBal);
+        } else {
+            System.out.println(" Error: Insufficient funds.");
+        }
+    }
+
+    // 6. DETAILS
+    public void displayDetails(String accountId, String pin) {
+        BankAccount account = findAccount(accountId);
+
+        if (account == null) {
+            System.out.println(" Error: Account ID not found.");
+            return;
+        }
+
+        if (!account.checkPin(pin)) {
+            System.out.println(" ACCESS DENIED: Incorrect PIN.");
+            return;
+        }
+
+        System.out.println("---  ACCOUNT DETAILS  ---");
         System.out.println("ID:      " + account.getAccountNumber());
         System.out.println("Holder:  " + account.getHoldername());
         System.out.println("Balance: $" + account.getBalance());
-
-        String status = account.isAccountActive() ? "Active" : "Inactive";
-        System.out.println("Status:  " + status);
-        System.out.println("-----------------------");
+        System.out.println("---------------------------");
     }
-
-    public void withdraw(BankAccount account,double amount)
-    {
-        if(account==null)
-        {
-            System.out.println("Your account is not Found!");
-            return;
-        }
-
-        if(amount<=0)
-        {
-            System.out.println("Error: amount must be positive");
-        }
-
-        //check
-        if (amount>account.getBalance())
-        {
-            System.out.println("Insufficent Balance");
-        }
-        else
-        {
-            double current_bal=account.getBalance();
-            double updated_bal=current_bal-amount;
-
-            account.setBalance(updated_bal);
-            System.out.println("Amount = " + amount + " is succesfully withdrwan...");
-            System.out.println("current balance is = " + current_bal);
-
-        }
-    }
-
-
 }

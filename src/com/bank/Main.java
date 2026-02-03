@@ -1,6 +1,5 @@
 package com.bank;
 
-import com.bank.data.BankAccount;
 import com.bank.service.Bank;
 import com.bank.utility.InputUtils;
 import java.util.Scanner;
@@ -8,85 +7,63 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        int choice=0;
-        Scanner sc=new Scanner(System.in);
-        // We create these OUTSIDE the loop so they stay alive forever.
-        Bank service = new Bank();
+        Bank bankService = new Bank();
+        Scanner sc = new Scanner(System.in);
+        int choice = 0;
 
-        // 2. THE HOLDER VARIABLE
-        // We set it to null initially because no account exists yet.
-        BankAccount myAccount = null;
+        while (choice != 5) {
+            System.out.println("\n===  WELCOME TO THE JAVA BANK  ===");
+            System.out.println("1. Open New Account");
+            System.out.println("2. Deposit Money");
+            System.out.println("3. Withdraw Money");
+            System.out.println("4. Account Details");
+            System.out.println("5. Exit");
+            System.out.print("Select an option: ");
 
-        while(choice!=5)
-        {
+            choice = sc.nextInt();
+            sc.nextLine(); // Consume newline
 
-                System.out.println("-------------------------------");
-                System.out.println("Welcome to The Bank....");
-                System.out.println("-------------------------------");
-                System.out.println("please select the corresponding digit for the operations");
-                System.out.println("1.create account");
-                System.out.println("2.Deposit amount");
-                System.out.println("3.withdraw amount");
-                System.out.println("4.display details");
-                System.out.println("5.exit");
-                System.out.println("-------------------------------");
+            switch (choice) {
+                case 1:
+                    System.out.println("\n--- Open Account ---");
+                    String name = InputUtils.readString("Enter your Name:");
+                    double bal = InputUtils.readDouble("Initial Deposit:");
+                    String newPin = InputUtils.readString("Set your 4-digit PIN:");
 
-                System.out.println("please enter your choice(1-5)...");
+                    bankService.createAccount(name, bal, newPin);
+                    break;
 
-                choice=sc.nextInt();
-                sc.nextLine();
+                case 2:
+                    System.out.println("\n--- Deposit ---");
+                    String dId = InputUtils.readString("Enter Account ID:");
+                    double dAmt = InputUtils.readDouble("Amount to Deposit:");
+                    String dPin = InputUtils.readString("Enter PIN:");
 
-                switch(choice)
-                    {
+                    bankService.deposit(dId, dAmt, dPin);
+                    break;
 
-                        case 1:
+                case 3:
+                    System.out.println("\n--- Withdraw ---");
+                    String wId = InputUtils.readString("Enter Account ID:");
+                    double wAmt = InputUtils.readDouble("Amount to Withdraw:");
+                    String wPin = InputUtils.readString("Enter PIN:");
+                    bankService.withdraw(wId, wAmt, wPin);
+                    break;
 
-                            System.out.println("creating account....");
-                            String name= InputUtils.readString("enter account holder name...");
-                            double bal= InputUtils.readDouble("please deposit starting amount...");
-                            boolean isAccountActive=true;
-                             myAccount  = service.createAccount(name,bal,isAccountActive) ;
-                            System.out.println(myAccount.getHoldername()+" your new account with account number"+myAccount.getAccountNumber()+"is created in the bank...");
-                        break;
-                        case 2:
-                            if(myAccount!=null)
-                            {
-                                double amount = InputUtils.readDouble("enter amount to deposit...");
-                                service.deposit(myAccount, amount);
+                case 4:
+                    System.out.println("\n--- Check Details ---");
+                    String cId = InputUtils.readString("Enter Account ID:");
+                    String cPin = InputUtils.readString("Enter PIN:");
+                    bankService.displayDetails(cId, cPin);
+                    break;
 
-                            }else
-                            {
-                                System.out.println("Create your account first....");
-                            }
-                            break;
-                        case 3:
-                            if(myAccount!=null)
-                            {
-                                double amount = InputUtils.readDouble("enter amount to withdraw...");
-                                service.withdraw(myAccount, amount);
+                case 5:
+                    System.out.println("Thank you for banking with us. Goodbye!");
+                    break;
 
-                            }else
-                            {
-                                System.out.println("Create your account first....");
-                            }
-                            break;
-                        case 4:
-                            if (myAccount!=null)
-                            {
-                                service.displayAccountDetails(myAccount);
-                            }
-                            else
-                            {
-                                System.out.println("Create your account first....");
-                            }
-                            break;
-
-                        default:
-                            System.out.println("other services are still in devlopment be patinet...");
-
-                    }
-
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
         }
-
     }
 }

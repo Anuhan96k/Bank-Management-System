@@ -13,16 +13,17 @@ public class InputUtils
 
         System.out.println(message);
         return sc.nextLine();
+
     }
 
     public static double readDouble(String message)
     {
         System.out.println(message);
-        return sc.nextDouble();
-    }
-    public void askForStartingBal(BankAccount account, double amount,Bank bank)
-    {
-        System.out.println("deposit starting balance...");
-        bank.deposit(account,amount);
+        double value = sc.nextDouble();
+
+
+        sc.nextLine(); // This clears the "Enter" key from memory
+
+        return value;
     }
 }
